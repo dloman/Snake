@@ -22,6 +22,7 @@ class Snake():
     self.mLineThickness = 10
     self.mWindowWidth = 800
     self.mWindowHeight = 700
+    self.mFont = pygame.font.Font('freesansbold.ttf',20)
     self.mDisplay = \
       pygame.display.set_mode((self.mWindowWidth,self.mWindowHeight))
     self.mClock = pygame.time.Clock()
@@ -65,6 +66,7 @@ class Snake():
     self.DrawBorder()
     self.DrawFood()
     self.DrawSnake()
+    self.DrawScore()
     pygame.display.update()
 
   #############################################################################
@@ -142,6 +144,13 @@ class Snake():
     elif Event.key == K_ESCAPE:
       pygame.quit()
       exit()
+
+  ##############################################################################
+  def DrawScore(self):
+    Surface = self.mFont.render('Score = %s' %(self.mScore), True, Red)
+    Rectangle = Surface.get_rect()
+    Rectangle.topleft = (self.mWindowWidth - 150, 25)
+    self.mDisplay.blit(Surface,Rectangle)
 
   ##############################################################################
   def Run(self):
