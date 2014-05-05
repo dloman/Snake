@@ -17,7 +17,7 @@ Blue = (0,0,255)
 class Snake():
   def __init__(self):
     pygame.init()
-    self.mFrameRate = 20
+    self.mFrameRate = 10
     self.mLineThickness = 10
     self.mWindowWidth = 800
     self.mWindowHeight = 700
@@ -32,31 +32,31 @@ class Snake():
       (MiddleX-2*self.mLineThickness,MiddleY)]
     self.mSnakeXDirection = 1
     self.mSnakeYDirection = 0
-    self.mFoodPosition = self.GetFoodPosition()
+    self.mFoodPosition = self.GetNextFoodPosition()
+    self.mScore = 0
 
   #############################################################################
   def IsInsideOfSnake(self, x, y):
     for SnakeX, SnakeY in self.mSnake:
       SnakeXRange = range(SnakeX,SnakeX + self.mLineThickness)
       SnakeYRange = range(SnakeY,SnakeY + self.mLineThickness)
-      if x in SnakeXRange or y in SnakeYRange:
-        return False
-    return True
+      if x in SnakeXRange and y in SnakeYRange:
+        return True
+    return False
 
 
   #############################################################################
-  def GetFoodPosition(self):
+  def GetNextFoodPosition(self):
     while True:
       x = random.randint( \
         self.mLineThickness, \
-        self.mWindowWidth/self.mLineThickness)*self.mLineThickness
+        (self.mWindowWidth-self.mLineThickness)/self.mLineThickness)*self.mLineThickness
       y = random.randint( \
         self.mLineThickness, \
-        self.mWindowHeight/self.mLineThickness)*self.mLineThickness
+        (self.mWindowHeight-self.mLineThickness)/self.mLineThickness)*self.mLineThickness
       if not self.IsInsideOfSnake(x, y):
         return x, y
 
-  #############################################################################
 
   #############################################################################
   def DrawGame(self):
@@ -98,7 +98,9 @@ class Snake():
 
   ##############################################################################
   def CheckForFoodCollision(self):
-    pass
+    if self.IsInsideOfSnake(self.mFoodPosition[0], self.mFoodPosition[1]):
+      self.mScore += 100 * len(self.mSnake)
+      self.mFoodPosition = self.GetNextFoodPosition()
 
   ##############################################################################
   def CheckForWallCollision(self):
