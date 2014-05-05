@@ -3,6 +3,7 @@
 import pygame
 import sys
 import random
+import time
 from pygame.locals import *
 
 ###############################################################################
@@ -33,6 +34,7 @@ class Snake():
     self.mSnakeXDirection = 1
     self.mSnakeYDirection = 0
     self.mFoodPosition = self.GetNextFoodPosition()
+    self.mTimeSinceLastIncrease = time.time()
     self.mScore = 0
 
   #############################################################################
@@ -94,12 +96,17 @@ class Snake():
     return x, y
   ##############################################################################
   def MoveSnake(self):
-    self.mSnake = [self.GetNextHead()] + self.mSnake[:-1]
+    if time.time() - self.mTimeSinceLastIncrease > 10:
+      self.mTimeSinceLastIncrease = time.time()
+      self.mSnake = [self.GetNextHead()] + self.mSnake
+    else:
+      self.mSnake = [self.GetNextHead()] + self.mSnake[:-1]
 
   ##############################################################################
   def CheckForFoodCollision(self):
     if self.IsInsideOfSnake(self.mFoodPosition[0], self.mFoodPosition[1]):
       self.mScore += 100 * len(self.mSnake)
+      self.mTimeSinceLastIncrease =-100
       self.mFoodPosition = self.GetNextFoodPosition()
 
   ##############################################################################
