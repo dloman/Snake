@@ -18,11 +18,12 @@ Blue = (0,0,255)
 class Snake():
   def __init__(self):
     pygame.init()
-    self.mFrameRate = 10
+    self.mFrameRate = 20
     self.mLineThickness = 10
     self.mWindowWidth = 800
     self.mWindowHeight = 700
     self.mFont = pygame.font.Font('freesansbold.ttf',20)
+    self.mBigFont = pygame.font.Font('freesansbold.ttf',40)
     self.mDisplay = \
       pygame.display.set_mode((self.mWindowWidth,self.mWindowHeight))
     self.mClock = pygame.time.Clock()
@@ -111,15 +112,32 @@ class Snake():
       self.mTimeSinceLastIncrease =-100
       self.mFoodPosition = self.GetNextFoodPosition()
 
+
+  ##############################################################################
+  def DisplayGameOver(self):
+    GameOverSurface = self.mBigFont.render('GAME OVER', True, Red)
+    GameOverRectangle = GameOverSurface.get_rect()
+    GameOverRectangle.midbottom = (self.mWindowWidth/2,self.mWindowHeight/2)
+    self.mDisplay.blit(GameOverSurface, GameOverRectangle)
+
+    ScoreSurface = self.mBigFont.render('Score = %s' %(self.mScore), True, Red)
+    ScoreRectangle = ScoreSurface.get_rect()
+    ScoreRectangle.midtop = GameOverRectangle.midbottom
+    self.mDisplay.blit(ScoreSurface, ScoreRectangle)
+
+
+    pygame.display.update()
+    time.sleep(5)
+
   ##############################################################################
   def CheckForWallCollision(self):
     x, y = self.mSnake[0]
     if x <= 0 or x + self.mLineThickness >= self.mWindowWidth:
-      print 'GAME OVER'
+      self.DisplayGameOver()
       pygame.quit()
       exit()
     elif y <= self.mLineThickness or y + 2*self.mLineThickness >= self.mWindowHeight:
-      print 'GAME OVER'
+      self.DisplayGameOver()
       pygame.quit()
       exit()
 
@@ -147,7 +165,7 @@ class Snake():
 
   ##############################################################################
   def DrawScore(self):
-    Surface = self.mFont.render('Score = %s' %(self.mScore), True, Red)
+    Surface = self.mFont.render('Score = %s' %(self.mScore), True, Green)
     Rectangle = Surface.get_rect()
     Rectangle.topleft = (self.mWindowWidth - 150, 25)
     self.mDisplay.blit(Surface,Rectangle)
