@@ -112,7 +112,6 @@ class Snake():
       self.mTimeSinceLastIncrease =-100
       self.mFoodPosition = self.GetNextFoodPosition()
 
-
   ##############################################################################
   def DisplayGameOver(self):
     GameOverSurface = self.mBigFont.render('GAME OVER', True, Red)
@@ -125,21 +124,27 @@ class Snake():
     ScoreRectangle.midtop = GameOverRectangle.midbottom
     self.mDisplay.blit(ScoreSurface, ScoreRectangle)
 
-
     pygame.display.update()
     time.sleep(5)
+
+  ##############################################################################
+  def Fail(self):
+    self.DisplayGameOver()
+    pygame.quit()
+    exit()
+
+  ##############################################################################
+  def CheckForSnakeCollision(self):
+    if len(set(self.mSnake)) < len(self.mSnake):
+      self.Fail()
 
   ##############################################################################
   def CheckForWallCollision(self):
     x, y = self.mSnake[0]
     if x <= 0 or x + self.mLineThickness >= self.mWindowWidth:
-      self.DisplayGameOver()
-      pygame.quit()
-      exit()
+      self.Fail()
     elif y <= self.mLineThickness or y + 2*self.mLineThickness >= self.mWindowHeight:
-      self.DisplayGameOver()
-      pygame.quit()
-      exit()
+      self.Fail()
 
   ##############################################################################
   def HandleKeyPress(self, Event):
@@ -186,6 +191,7 @@ class Snake():
         self.MoveSnake()
         self.CheckForFoodCollision()
         self.CheckForWallCollision()
+        self.CheckForSnakeCollision()
       except KeyboardInterrupt:
         pygame.quit()
         exit()
