@@ -2,9 +2,10 @@
 
 import pygame
 import sys
-import random
 import time
 from pygame.locals import *
+from itertools import cycle
+from random import randint
 
 ###############################################################################
 Black = (0,0,0)
@@ -12,6 +13,7 @@ White = (255,255,255)
 Red = (255,0,0)
 Green = (0,255,0)
 Blue = (0,0,255)
+Rainbow = cycle([Red,Green,Blue, (255,255,0),(255,0,255),(0,255,255)])
 ###############################################################################
 
 ###############################################################################
@@ -52,12 +54,13 @@ class Snake():
   #############################################################################
   def GetNextFoodPosition(self):
     while True:
-      x = random.randint( \
+      x = randint( \
         self.mLineThickness, \
         (self.mWindowWidth-self.mLineThickness)/self.mLineThickness)*self.mLineThickness
-      y = random.randint( \
+      y = randint( \
         self.mLineThickness, \
         (self.mWindowHeight-self.mLineThickness)/self.mLineThickness)*self.mLineThickness
+      self.mFoodColor = self.GetRandomColor()
       if not self.IsInsideOfSnake(x, y):
         return x, y
 
@@ -83,13 +86,16 @@ class Snake():
   def DrawSnake(self):
     for x,y in self.mSnake:
       Rect = pygame.Rect(x, y, self.mLineThickness, self.mLineThickness)
-      pygame.draw.rect(self.mDisplay, White, Rect)
+      pygame.draw.rect(self.mDisplay, next(Rainbow), Rect)
 
+  ##############################################################################
+  def GetRandomColor(self):
+    return randint(0,255),randint(0,255),randint(0,255)
   ##############################################################################
   def DrawFood(self):
     x,y = self.mFoodPosition
     Food = pygame.Rect(x,y, self.mLineThickness, self.mLineThickness)
-    pygame.draw.rect(self.mDisplay, White, Food)
+    pygame.draw.rect(self.mDisplay, self.mFoodColor, Food)
 
   ##############################################################################
   def GetNextHead(self):
@@ -172,7 +178,7 @@ class Snake():
   def DrawScore(self):
     Surface = self.mFont.render('Score = %s' %(self.mScore), True, Green)
     Rectangle = Surface.get_rect()
-    Rectangle.topleft = (self.mWindowWidth - 150, 25)
+    Rectangle.topleft = (self.mLineThickness*3, self.mLineThickness*2)
     self.mDisplay.blit(Surface,Rectangle)
 
   ##############################################################################
