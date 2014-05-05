@@ -17,6 +17,7 @@ Rainbow = cycle([Red,Green,Blue, (255,255,0),(255,0,255),(0,255,255)])
 ###############################################################################
 
 ###############################################################################
+###############################################################################
 class Snake():
   def __init__(self):
     pygame.init()
@@ -39,6 +40,7 @@ class Snake():
     self.mSnakeYDirection = 0
     self.mFoodPosition = self.GetNextFoodPosition()
     self.mTimeSinceLastIncrease = time.time()
+    self.mTimeSinceLastFood = time.time()
     self.mScore = 0
 
   #############################################################################
@@ -49,7 +51,6 @@ class Snake():
       if x in SnakeXRange and y in SnakeYRange:
         return True
     return False
-
 
   #############################################################################
   def GetNextFoodPosition(self):
@@ -63,7 +64,6 @@ class Snake():
       self.mFoodColor = self.GetRandomColor()
       if not self.IsInsideOfSnake(x, y):
         return x, y
-
 
   #############################################################################
   def DrawGame(self):
@@ -105,7 +105,7 @@ class Snake():
     return x, y
   ##############################################################################
   def MoveSnake(self):
-    if time.time() - self.mTimeSinceLastIncrease > 10:
+    if time.time() - self.mTimeSinceLastIncrease > 5:
       self.mTimeSinceLastIncrease = time.time()
       self.mSnake = [self.GetNextHead()] + self.mSnake
     else:
@@ -182,6 +182,11 @@ class Snake():
     self.mDisplay.blit(Surface,Rectangle)
 
   ##############################################################################
+  def CheckIfStuck(self):
+    if time.time() - self.mTimeSinceLastIncrease > 10:
+      self.mFoodPosition = self.GetNextFoodPosition()
+
+  ##############################################################################
   def Run(self):
     while True:
       try:
@@ -198,6 +203,7 @@ class Snake():
         self.CheckForFoodCollision()
         self.CheckForWallCollision()
         self.CheckForSnakeCollision()
+        self.CheckIfStuck()
       except KeyboardInterrupt:
         pygame.quit()
         exit()
