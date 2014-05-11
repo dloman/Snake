@@ -220,7 +220,7 @@ class Snake():
     x, y = self.mSnake[0]
     if x <= 0 or x + self.mLineThickness >= self.mWindowWidth:
       self.Fail()
-    elif y <= self.mLineThickness or y + 2*self.mLineThickness >= self.mWindowHeight:
+    elif y <= 0 or y + self.mLineThickness >= self.mWindowHeight:
       self.Fail()
 
   ##############################################################################
