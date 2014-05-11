@@ -34,6 +34,10 @@ class Snake():
       pygame.display.set_mode((self.mWindowWidth,self.mWindowHeight))
     self.mClock = pygame.time.Clock()
     pygame.display.set_caption('Snake')
+    self.mGameOver = True
+
+  #############################################################################
+  def StartGame(self):
     MiddleX, MiddleY = self.mWindowWidth/2, self.mWindowHeight/2
     self.mSnakeLength = 3
     self.mSnake = [(MiddleX, MiddleY), \
@@ -82,13 +86,55 @@ class Snake():
     while True:
       x = randint( \
         self.mLineThickness, \
-        (self.mWindowWidth-self.mLineThickness)/self.mLineThickness)*self.mLineThickness
+        (self.mWindowWidth-2*self.mLineThickness)/self.mLineThickness)*self.mLineThickness
       y = randint( \
         self.mLineThickness, \
-        (self.mWindowHeight-self.mLineThickness)/self.mLineThickness)*self.mLineThickness
+        (self.mWindowHeight-2*self.mLineThickness)/self.mLineThickness)*self.mLineThickness
       self.mFoodColor = self.GetRandomColor()
       if not self.IsInsideOfSnake(x, y):
         return x, y
+
+  #############################################################################
+  def DrawMenu(self):
+    NewGameSurface = \
+      self.mBigFont.render('Press s to start a new game!', True, Red)
+    NewGameRectangle = NewGameSurface.get_rect()
+    NewGameRectangle.midbottom = (self.mWindowWidth/2,(self.mWindowHeight/4))
+
+    HighScoreSurface = \
+      self.mBigFont.render('Pess h to see high scores!', True, Blue)
+    HighScoreRectangle = HighScoreSurface.get_rect()
+    HighScoreRectangle.midtop = NewGameRectangle.midbottom
+
+    EscapeSurface = \
+      self.mBigFont.render('Pess Esc or Q to exit!', True, Green)
+    EscapeRectangle = EscapeSurface.get_rect()
+    EscapeRectangle.midtop = HighScoreRectangle.midbottom
+
+    self.mDisplay.blit(NewGameSurface, NewGameRectangle)
+    self.mDisplay.blit(HighScoreSurface, HighScoreRectangle)
+    self.mDisplay.blit(EscapeSurface, EscapeRectangle)
+
+  #############################################################################
+  def DrawColorBorder(self):
+    for xPos in range(self.mWindowWidth/10, 9*self.mWindowWidth/10, self.mLineThickness):
+      TopRectangle = pygame.Rect(xPos,self.mWindowHeight/10, self.mLineThickness, self.mLineThickness)
+      BottomRectangle = pygame.Rect(xPos,9*self.mWindowHeight/10, self.mLineThickness, self.mLineThickness)
+      pygame.draw.rect(self.mDisplay, self.GetRandomColor(),TopRectangle)
+      pygame.draw.rect(self.mDisplay, self.GetRandomColor(),BottomRectangle)
+    for yPos in range(self.mWindowHeight/10, 9*self.mWindowHeight/10+self.mLineThickness,self.mLineThickness):
+      LeftRectangle = pygame.Rect(self.mWindowWidth/10,yPos, self.mLineThickness, self.mLineThickness)
+      RightRectangle = pygame.Rect(9*self.mWindowWidth/10,yPos, self.mLineThickness, self.mLineThickness)
+      pygame.draw.rect(self.mDisplay, self.GetRandomColor(),LeftRectangle)
+      pygame.draw.rect(self.mDisplay, self.GetRandomColor(),RightRectangle)
+
+
+  #############################################################################
+  def DrawStartScreen(self):
+    self.DrawBorder()
+    self.DrawMenu()
+    self.DrawColorBorder()
+    pygame.display.update()
 
   #############################################################################
   def DrawGame(self):
@@ -250,13 +296,16 @@ class Snake():
           elif Event.type == KEYDOWN:
             self.HandleKeyPress(Event)
 
-        self.DrawGame()
-        self.mClock.tick(self.mFrameRate)
-        self.MoveSnake()
-        self.CheckForFoodCollision()
-        self.CheckForWallCollision()
-        self.CheckForSnakeCollision()
-        self.CheckIfStuck()
+        if self.mGameOver:
+          self.DrawStartScreen()
+        else:
+          self.DrawGame()
+          self.mClock.tick(self.mFrameRate)
+          self.MoveSnake()
+          self.CheckForFoodCollision()
+          self.CheckForWallCollision()
+          self.CheckForSnakeCollision()
+          self.CheckIfStuck()
       except KeyboardInterrupt:
         pygame.quit()
         exit()
