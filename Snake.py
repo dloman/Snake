@@ -1,8 +1,11 @@
 #!/usr/bin/python
 
+import os
+import pickle
 import pygame
 import sys
 import time
+
 from pygame.locals import *
 from itertools import cycle
 from random import randint
@@ -51,6 +54,28 @@ class Snake():
       if x in SnakeXRange and y in SnakeYRange:
         return True
     return False
+
+  #############################################################################
+  def GetHighScoreList(self):
+    try:
+      return pickle.load(\
+        open(os.path.expanduser('~/') + '.SnakeHighScore.pickle','rb'))
+    except IOError:
+      return [0,0,0,0,0]
+
+  #############################################################################
+  def SaveHighScores(self):
+    NewHighScoreList = []
+    OldHighScores = self.GetHighScoreList()
+    for HighScore in OldHighScores:
+      if self.mScore > HighScore:
+        NewHighScoreList.append(self.mScore)
+        self.mScore = HighScore
+      else:
+        NewHighScoreList.append(HighScore)
+    pickle.dump( \
+      NewHighScoreList, \
+      open(os.path.expanduser('~/') + '.SnakeHighScore.pickle','wb'))
 
   #############################################################################
   def GetNextFoodPosition(self):
@@ -131,13 +156,13 @@ class Snake():
     self.mDisplay.blit(ScoreSurface, ScoreRectangle)
 
     pygame.display.update()
-    time.sleep(5)
+    time.sleep(3)
 
   ##############################################################################
   def Fail(self):
     self.DisplayGameOver()
-    pygame.quit()
-    exit()
+    self.SaveHighScores()
+    self.mGameOver = True
 
   ##############################################################################
   def CheckForSnakeCollision(self):
@@ -170,9 +195,37 @@ class Snake():
       if self.mSnakeXDirection == 0:
         self.mSnakeXDirection = -1
         self.mSnakeYDirection = 0
-    elif Event.key == K_ESCAPE:
+    elif Event.key == K_ESCAPE or Event.key == 113:
       pygame.quit()
       exit()
+    elif Event.key == 115:
+      self.StartGame()
+      self.mGameOver = False
+    elif Event.key == 104:
+      self.DrawHighScoreScreen()
+
+  ##############################################################################
+  def DrawHighScore(self, Place, Score):
+    ScoreSurface = self.mFont.render('%s.  %s' %(Place +1, Score), True, next(Rainbow))
+    ScoreRectangle = ScoreSurface.get_rect()
+    ScoreRectangle.midbottom = \
+      (self.mWindowWidth/2,self.mWindowHeight/4+ Place*self.mWindowHeight/8)
+    self.mDisplay.blit(ScoreSurface,ScoreRectangle)
+    pygame.display.update()
+
+  ##############################################################################
+  def DrawHighScoreScreen(self):
+    self.DrawBorder()
+    for Place, Score in enumerate(self.GetHighScoreList()):
+      delay = time.time()
+      while time.time() -delay < 1:
+        self.DrawColorBorder()
+        self.DrawHighScore(Place,Score)
+
+    delay = time.time()
+    while time.time() -delay < 3:
+      self.DrawColorBorder()
+      pygame.display.update()
 
   ##############################################################################
   def DrawScore(self):
